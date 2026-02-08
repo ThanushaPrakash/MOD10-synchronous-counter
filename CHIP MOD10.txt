@@ -1,0 +1,34 @@
+CHIP MOD10 {
+    OUT out[4];        // 4-bit output representing the counter
+
+    PARTS:
+    // Negations of the current outputs
+    Not(in=q1, out=q1bar);
+    Not(in=q2, out=q2bar);
+    Not(in=q3, out=q3bar);
+    Not(in=q4, out=q4bar);
+
+    // JK inputs logic
+    And3way(a=q2bar, b=q3bar, c=q4bar, out=J1);
+    And3way(a=q1, b=q2bar, c=q3bar, out=x);
+    And(a=q4bar, b=x, out=J2);
+    And3way(a=q1bar, b=q2, c=q4bar, out=y);
+    And(a=q1, b=J1, out=z);
+    Or(a=y, b=z, out=J3);
+
+    And3way(a=q2bar, b=q3bar, c=q4bar, out=K1);
+    And3way(a=q1bar, b=q3bar, c=q4bar, out=K2);
+    And(a=q1bar, b=q4bar, out=K3);
+
+    // JK Flip-Flops for each bit
+    JK(J=true, K=true, outq=q4);              // LSB, always toggling
+    JK(J=J3, K=K3, outq=q3);                 // Controlled by J3, K3
+    JK(J=J2, K=K2, outq=q2);                 // Controlled by J2, K2
+    JK(J=J1, K=K1, outq=q1);                 // MSB, controlled by J1, K1
+
+    // Map outputs to the 4-bit output bus
+    Or(a=q4, b=false, out=out[0]);           // LSB
+    Or(a=q3, b=false, out=out[1]);           // Bit 1
+    Or(a=q2, b=false, out=out[2]);           // Bit 2
+    Or(a=q1, b=false, out=out[3]);           // MSB
+}  explain each sentenxces
